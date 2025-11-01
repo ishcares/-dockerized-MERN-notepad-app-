@@ -1,0 +1,42 @@
+services:
+  # --- Backend Service (Express API) ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: notesapp-backend
+    restart: always
+
+    # Map Host Port 8080 → Container Port 8000
+    ports:
+      - "8080:8000"
+
+    # 👇 This line ensures .env in backend folder is read correctly
+    env_file:
+      - ./backend/.env
+
+    environment:
+      - ALLOWED_ORIGIN=http://frontend
+      - PORT=8000
+
+  # --- Frontend Service (Vite + Nginx) ---
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=/api
+        - CACHEBUST=${CACHEBUST_TIMESTAMP}
+    container_name: notesapp-frontend
+    restart: always
+
+    # Map browser port 5173 → container port 80 (Nginx)
+    ports:
+      - "5173:80"
+
+    environment:
+      - VITE_BACKEND_URL=/api 
+
+    depends_on:
+      - backend
+
