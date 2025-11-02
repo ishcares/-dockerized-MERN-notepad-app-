@@ -31,7 +31,15 @@ app.use((err, req, res, next) => {
 app.use(express.json());
 
 // ✅ Allow CORS
-app.use(cors());
+const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+  })
+);
 
 // ✅ Connect to MongoDB
 mongoose
