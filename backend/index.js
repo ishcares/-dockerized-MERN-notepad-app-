@@ -35,9 +35,12 @@ app.use("/api/notes", noteRoutes); // handles /api/notes routes
 
 // ✅ Protected test route (optional)
 app.get("/api/protected", authenticateToken, (req, res) => {
-  res.json({ success: true, message: "You have access!", user: req.user });
+  res.json({ success: true, message: "You have access!", user: req.user });
 });
 
-// ✅ Start server
+// 🟢 CRITICAL FIX: Define the PORT variable before the server starts
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`✅ Server running at http://localhost:${PORT}`));
+
+app.listen(PORT, '0.0.0.0', () => { 
+    console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
+});
