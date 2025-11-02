@@ -19,19 +19,19 @@ const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        console.error('💥 Bad JSON received:', req.body);
+        return res.status(400).send({ success: false, message: 'Invalid JSON format in request body.' });
+    }
+    next();
+});
+
 // ✅ Middleware
 app.use(express.json());
 
 // ✅ Allow CORS
-const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
-app.use(
-  cors({
-    origin: allowedOrigin,
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
-  })
-);
+app.use(cors());
 
 // ✅ Connect to MongoDB
 mongoose
