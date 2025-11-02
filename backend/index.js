@@ -1,3 +1,13 @@
+process.on('uncaughtException', (err) => {
+    // This logs synchronous errors (the most likely cause of a crash)
+    console.error('💥 Uncaught Exception:', err.message, err.stack);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    // This logs asynchronous promise errors
+    console.error('⚠️ Unhandled Rejection:', reason.stack || reason);
+});
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
@@ -29,6 +39,11 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
+  app.get("/", (req, res) => {
+
+    res.json({ status: "ok", service: "Notes Backend" });
+
+});
 // ✅ Routes
 app.use("/api", authRoutes);       // handles /api/login and /api/signup
 app.use("/api/notes", noteRoutes); // handles /api/notes routes
@@ -41,6 +56,13 @@ app.get("/api/protected", authenticateToken, (req, res) => {
 // 🟢 CRITICAL FIX: Define the PORT variable before the server starts
 const PORT = process.env.PORT || 8000;
 
-app.listen(PORT, '0.0.0.0', () => { 
-    console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
+// Use a variable to hold the server instance
+const server = app.listen(PORT, '0.0.0.0', () => { 
+    console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
 });
+
+// ⚡ CRITICAL FIX: Increase timeouts to prevent 502 on Render proxy
+server.keepAliveTimeout = 65000; // 65 seconds
+server.headersTimeout = 66000; // 66 seconds
+
+// ------------------------------------------
