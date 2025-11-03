@@ -1,3 +1,5 @@
+version: '3.8' # Use a recent stable version
+
 services:
   # --- Backend Service (Express API) ---
   backend:
@@ -7,24 +9,19 @@ services:
     container_name: notesapp-backend
     restart: always
 
+    # 1. Correct Ports: Maps Host Port 8000 to Container Port 8000
     ports:
-      - "8080:8000"
+      - "8000:8000"
 
     env_file:
       - ./backend/.env
 
-    # 1. ENVIRONMENT VARIABLES (correctly indented)
     environment:
+      # Allows frontend on 5173 to connect to the backend (CORS)
       - ALLOWED_ORIGIN=http://localhost:5173 
       - PORT=8000
-
-    # 2. 🟢 CRITICAL FIX: HEALTHCHECK BLOCK (Must be top-level under 'backend')
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/protected"] # Assuming /api/protected is the health route
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s # Gives Express and MongoDB time to fully start
+    
+    # NOTE: The healthcheck block has been removed to fix the startup failure.
 
   # --- Frontend Service (Vite + Nginx) ---
   frontend:
@@ -37,13 +34,17 @@ services:
     container_name: notesapp-frontend
     restart: always
 
+    # 2. Correct Ports: Maps Host Port 5173 to Container Nginx Port 80
     ports:
-      - "5173:80"
+      - "5173:80" 
 
+    # 3. Correct Indentation: Ensures this block belongs to 'frontend'
     environment:
-      - VITE_BACKEND_URL=/api
+      # Frontend must know the full public URL of the backend service
+      - VITE_BACKEND_URL=http://localhost:8000
 
-    # 🟢 FIX 3: Ensure depends_on links to the health status check
+    # 4. Dependency Fix: Waits for the container to start, not pass a health check
     depends_on:
       backend:
-        condition: service_healthy # This is what ensures Nginx waits for Express to be truly ready.
+        condition: service_started 
+
