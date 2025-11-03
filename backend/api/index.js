@@ -1,19 +1,19 @@
 process.on('uncaughtException', (err) => {
-    console.error('💥 Uncaught Exception:', err.message, err.stack);
+    console.error('💥 Uncaught Exception:', err.message, err.stack);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('⚠️ Unhandled Rejection:', reason.stack || reason);
+    console.error('⚠️ Unhandled Rejection:', reason.stack || reason);
 });
 
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { authenticateToken } = require("./utilities");
+const { authenticateToken } = require("../utilities");
 
-const noteRoutes = require("./routes/notes.routes");
-const authRoutes = require("./routes/auth.routes");
+const noteRoutes = require("../routes/notes.routes");
+const authRoutes = require("../routes/auth.routes");
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.use(express.json());
 const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
 app.use(
   cors({
-    origin: allowedOrigin,
+     origin: allowedOrigin,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
@@ -39,7 +39,7 @@ mongoose
 
 // 4. ✅ ROOT ROUTE & API ROUTES
 app.get("/", (req, res) => {
-    res.json({ status: "ok", service: "Notes Backend" });
+    res.json({ status: "ok", service: "Notes Backend" });
 });
 
 app.use("/api", authRoutes);      
@@ -58,12 +58,5 @@ app.use((err, req, res, next) => {
     next(err); // Pass other errors down the line
 });
 
-// 6. 🚀 START SERVER
-const PORT = process.env.PORT || 8000;
-const server = app.listen(PORT, '0.0.0.0', () => { 
-    console.log(`✅ Server running at http://0.0.0.0:${PORT}`);
-});
 
-// ⚡ RENDER TIMEOUT FIXES
-server.keepAliveTimeout = 65000; 
-server.headersTimeout = 66000;
+module.exports = app;
