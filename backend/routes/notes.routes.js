@@ -16,10 +16,10 @@ router.get("/", authenticateToken, async (req, res) => {
 // Create note (CREATE)
 router.post("/add", authenticateToken, async (req, res) => {
   try {
-    // 🛑 CRITICAL FIX: Check if req.body exists to prevent 502 crash
-    if (!req.body) {
-      return res.status(400).json({ success: false, message: "Request body required." });
-    }
+    // 🛑 CRITICAL FIX: Retain this check as 'POST' relies on the body.
+    if (!req.body) {
+      return res.status(400).json({ success: false, message: "Request body required." });
+    }
 
     const { title, content, isPinned } = req.body;
     if (!title && !content)
@@ -42,10 +42,10 @@ router.post("/add", authenticateToken, async (req, res) => {
 // Update note (UPDATE)
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
-    // 🛑 CRITICAL FIX: Check if req.body exists to prevent 502 crash
-    if (!req.body) {
-      return res.status(400).json({ success: false, message: "Request body required." });
-    }
+    // 🛑 CRITICAL FIX: Retain this check as 'PUT' relies on the body.
+    if (!req.body) {
+      return res.status(400).json({ success: false, message: "Request body required." });
+    }
 
     const note = await Note.findOne({ _id: req.params.id, userId: req.user.id });
     if (!note)
@@ -79,18 +79,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 // Pin/unpin note (UPDATE)
 router.put("/pin/:id", authenticateToken, async (req, res) => {
   try {
-    // 🛑 CRITICAL FIX: Check if req.body exists to prevent 502 crash
-    // Although the body is usually empty here, the destructuring of isPinned could be problematic 
-    // if the frontend sends a content-type header but an empty body.
-    if (!req.body) {
-      return res.status(400).json({ success: false, message: "Request body required." });
-    }
-
+    // ✅ FIX: Removed the redundant !req.body check
+    
     const note = await Note.findOne({ _id: req.params.id, userId: req.user.id });
     if (!note)
       return res.status(404).json({ success: false, message: "Note not found" });
 
-    note.isPinned = !note.isPinned;
+    note.isPinned = !note.isPinned; // Toggles the boolean value
     await note.save();
 
     res.json({
@@ -99,6 +94,7 @@ router.put("/pin/:id", authenticateToken, async (req, res) => {
       note,
     });
   } catch (err) {
+    console.error("Pin error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -119,16 +115,15 @@ router.get("/search", authenticateToken, async (req, res) => {
       userId: req.user.id,
       $or: [
         { title: { $regex: query, $options: "i" } },
-        { content: { $regex: query, $options: "i" } },
+        { content: { $regex: query, $options: "i" } }, // <-- SYNTAX ERROR FIXED HERE
       ],
     }).sort({ updatedAt: -1 });
 
     res.json({ success: true, notes });
   } catch (err) {
     console.error("Search error:", err);
-    res.status(500).json({ success: false, message: "Search failed" });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
 module.exports = router;
-

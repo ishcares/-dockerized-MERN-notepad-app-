@@ -40,22 +40,24 @@ router.post("/login", async (req, res) => {
 // 🟣 SIGNUP
 router.post("/create-account", async (req, res) => {
   try {
-    // 🛑 CRITICAL FIX: Check if req.body exists to prevent 502 crash
+    // 🛑 CRITICAL FIX: Check if req.body exists... (kept for safety)
     if (!req.body) {
       return res.status(400).json({ success: false, message: "Request body required." });
     }
 
-    const { email, password } = req.body;
+    // 🔑 FIX 1: Add fullName to the destructured properties
+    const { fullName, email, password } = req.body; 
     
     // Check for missing fields
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required." });
+    if (!fullName || !email || !password) { // 🔑 FIX 2: Check for fullName here too
+      return res.status(400).json({ success: false, message: "All fields are required." });
     }
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ success: false, message: "User already exists" });
 
-    const newUser = new User({ email, password });
+    // 🔑 FIX 3: Include fullName in the Mongoose constructor
+    const newUser = new User({ fullName, email, password }); 
     await newUser.save();
 
     res.status(201).json({ success: true, message: "Account created successfully" });
