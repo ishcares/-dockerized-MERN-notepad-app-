@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
@@ -24,7 +26,5 @@
     "tailwindcss": "^3.4.1",
     "vite": "^5.1.4"
   },
-  "homepage": "https://github.com/ishcares/distributed-task-orchestrator",
-  "predeploy": "npm run build",
-  "deploy": "gh-pages -d dist"
+  "homepage": "https://ishcares.github.io/distributed-task-orchestrator/"
 }
