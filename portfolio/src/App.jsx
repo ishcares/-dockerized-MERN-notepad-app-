@@ -276,14 +276,25 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-forest-100/5 flex items-center justify-between">
-                <a 
-                  href="#dashboard" 
-                  className="flex items-center space-x-1.5 text-xs text-forest-400 hover:text-forest-300 transition font-semibold"
-                >
-                  <span>Explore Live Dashboard</span>
-                  <ArrowRight size={12} />
-                </a>
+              <div className="pt-5 border-t border-forest-100/5 flex flex-wrap gap-4 items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <a 
+                    href="https://notepad-app-pearl.vercel.app/" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="flex items-center space-x-1.5 text-xs text-forest-400 hover:text-forest-300 transition font-semibold"
+                  >
+                    <span>Live App</span>
+                    <ExternalLink size={12} />
+                  </a>
+                  <a 
+                    href="#dashboard" 
+                    className="flex items-center space-x-1.5 text-xs text-slate-400 hover:text-white transition font-semibold"
+                  >
+                    <span>Pipeline Demo</span>
+                    <ArrowRight size={12} />
+                  </a>
+                </div>
                 <a 
                   href="https://github.com/ishcares" 
                   target="_blank" 
